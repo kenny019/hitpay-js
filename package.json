@@ -11,7 +11,7 @@
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
 	"author": "",
-	"license": "ISC",
+	"license": "MIT",
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "^5.57.0",
 		"@typescript-eslint/parser": "^5.57.0",
