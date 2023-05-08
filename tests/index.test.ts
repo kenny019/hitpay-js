@@ -33,15 +33,31 @@ describe('HitpayClient', () => {
 			environment: 'sandbox',
 		});
 
-		test('Create payment', async () => {
+		test('Create payment with all required params', async () => {
 			const createPaymentRes = await hitpay.createPayment({
 				amount: 5,
 				currency: 'SGD',
 			});
 
-			console.log(createPaymentRes);
-
 			expect(createPaymentRes.success).toBeTruthy();
+		});
+
+		test('Create payment with missing params', async () => {
+			const createPaymentRes = await hitpay.createPayment({
+				currency: '',
+				amount: 5,
+			});
+
+			expect(createPaymentRes.success).toBeFalsy();
+		});
+
+		test('Create payment with invalid amount', async () => {
+			const createPaymentRes = await hitpay.createPayment({
+				currency: '',
+				amount: 0.1,
+			});
+
+			expect(createPaymentRes.success).toBeFalsy();
 		});
 	});
 });
