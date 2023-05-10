@@ -1,99 +1,36 @@
-import fetch from 'node-fetch';
 import z from 'zod';
 
 import { createHmac } from 'crypto';
-import {
+import type {
 	CreatePaymentSuccessResponse,
 	HitpayConstructorParams,
-	InvalidResponse,
 	PaymentParams,
-	hitpayResponse,
-	httpResponse,
+	CreatePaymentResponse,
+	SuccessHitpayResponse,
+	FailedHitpayResponse,
 } from './types';
 import { createPaymentParamsSchema, hitpayConstructorSchema } from './schemas';
-
-class HttpClient {
-	protected apiKey: string;
-
-	constructor(apiKey: string) {
-		if (!apiKey) throw new Error('apiKey is required');
-
-		this.apiKey = apiKey;
-	}
-
-	async get(url: string): Promise<httpResponse> {
-		try {
-			const response = await fetch(url, {
-				method: 'GET',
-				headers: {
-					'X-Requested-With': 'XMLHttpRequest',
-					'X-BUSINESS-API-KEY': this.apiKey,
-				},
-			});
-
-			if (response.status === 422) {
-				const data = (await response.json()) as InvalidResponse;
-
-				return { error: new Error(data.message), data: undefined };
-			}
-
-			if (response.status.toString()[0] === '2') {
-				const data = (await response.json()) as Record<string, any>;
-				return { error: undefined, data };
-			}
-
-			return {
-				error: new Error(`Server responded with ${response.status}`),
-				data: undefined,
-			};
-		} catch (error) {
-			return {
-				error,
-				data: undefined,
-			};
-		}
-	}
-
-	async post(url: string, postBody: Record<string, any>): Promise<httpResponse> {
-		try {
-			const payload = new URLSearchParams(postBody);
-
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					'X-Requested-With': 'XMLHttpRequest',
-					'X-BUSINESS-API-KEY': this.apiKey,
-				},
-				body: payload,
-			});
-
-			if (response.status === 422) {
-				const data = (await response.json()) as InvalidResponse;
-
-				return { error: new Error(data.message), data: undefined };
-			}
-
-			if (response.status.toString()[0] === '2') {
-				const data = (await response.json()) as Record<string, any>;
-				return { error: undefined, data };
-			}
-
-			return {
-				error: new Error(`Server responded with ${response.status}`),
-				data: undefined,
-			};
-		} catch (error) {
-			return {
-				error: error,
-				data: undefined,
-			};
-		}
-	}
-}
+import { HttpClient } from './HttpClient';
 
 enum HITPAY_ENV {
 	sandbox = 'https://api.sandbox.hit-pay.com/v1/',
 	production = 'https://api.hit-pay.com/v1/',
+}
+
+function ErrorResponse(error: unknown): FailedHitpayResponse {
+	return {
+		success: false,
+		error,
+		data: undefined,
+	};
+}
+
+function SuccessResponse(data: Record<string, any> | undefined): SuccessHitpayResponse {
+	return {
+		success: true,
+		error: undefined,
+		data: data || {},
+	};
 }
 
 class HitpayClient {
@@ -147,33 +84,37 @@ class HitpayClient {
 		};
 	}
 
-	async createPayment(paymentParams: PaymentParams): Promise<hitpayResponse> {
+	async createPayment(paymentParams: PaymentParams): Promise<CreatePaymentResponse | FailedHitpayResponse> {
 		const createPaymentParamRes = createPaymentParamsSchema.safeParse(paymentParams);
 
 		if (!createPaymentParamRes.success) {
-			return {
-				success: false,
-				error: createPaymentParamRes.error,
-				data: undefined,
-			};
+			return ErrorResponse(createPaymentParamRes.error);
 		}
 
 		const createPaymentParam = createPaymentParamRes.data;
 		const { data, error } = await this.http.post(this.hitpayURL + 'payment-requests', createPaymentParam);
 
 		if (error) {
-			return {
-				success: false,
-				error,
-				data: undefined,
-			};
+			return ErrorResponse(error);
 		}
 
-		return {
-			success: true,
-			error: undefined,
-			data: data as CreatePaymentSuccessResponse,
-		};
+		return SuccessResponse(data) as CreatePaymentResponse;
+	}
+
+	async deletePayment(requestId: string): Promise<SuccessHitpayResponse | FailedHitpayResponse> {
+		const requestIdRes = z.string().safeParse(requestId);
+
+		if (!requestIdRes.success) {
+			return ErrorResponse(requestIdRes.error);
+		}
+
+		const { error } = await this.http.delete(`${this.hitpayURL}payment-requests/${requestIdRes.data}`);
+
+		if (error) {
+			return ErrorResponse(error);
+		}
+
+		return SuccessResponse({});
 	}
 }
 

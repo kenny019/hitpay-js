@@ -6,12 +6,20 @@ export type InvalidResponse = {
 export type HitpayConstructorParams = z.infer<typeof hitpayConstructorSchema>;
 export type PaymentParams = z.infer<typeof createPaymentParamsSchema>;
 export type CreatePaymentSuccessResponse = z.infer<typeof createPaymentSuccessSchema>;
-export type httpResponse = {
+export type HttpResponse = {
     data: Record<string, any> | undefined;
     error: unknown | Error;
 };
-export type hitpayResponse = {
-    data: Record<string, any> | undefined;
+export type FailedHitpayResponse = {
+    data: undefined;
     error: unknown;
-    success: boolean;
+    success: false;
 };
+export type SuccessHitpayResponse = {
+    data: Record<string, any>;
+    error: undefined;
+    success: true;
+};
+export interface CreatePaymentResponse extends SuccessHitpayResponse {
+    data: CreatePaymentSuccessResponse;
+}

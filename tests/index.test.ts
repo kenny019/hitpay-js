@@ -60,4 +60,25 @@ describe('HitpayClient', () => {
 			expect(createPaymentRes.success).toBeFalsy();
 		});
 	});
+
+	describe('Delete Payment', () => {
+		const hitpay = new HitpayClient({
+			apiKey: process.env.HITPAY_API_KEY as string,
+			apiSalt: process.env.HITPAY_SALT as string,
+			environment: 'sandbox',
+		});
+
+		test('Delete payment', async () => {
+			const { success, data } = await hitpay.createPayment({
+				currency: 'SGD',
+				amount: 5,
+			});
+
+			if (success) {
+				const isPaymentDeleted = await hitpay.deletePayment(data.id);
+
+				expect(isPaymentDeleted.success).toBeTruthy();
+			}
+		});
+	});
 });

@@ -1,10 +1,5 @@
-import { HitpayConstructorParams, PaymentParams, hitpayResponse, httpResponse } from './types';
-declare class HttpClient {
-    protected apiKey: string;
-    constructor(apiKey: string);
-    get(url: string): Promise<httpResponse>;
-    post(url: string, postBody: Record<string, any>): Promise<httpResponse>;
-}
+import type { HitpayConstructorParams, PaymentParams, CreatePaymentResponse, SuccessHitpayResponse, FailedHitpayResponse } from './types';
+import { HttpClient } from './HttpClient';
 declare class HitpayClient {
     protected apiSalt: string;
     protected hitpayURL: string;
@@ -17,6 +12,7 @@ declare class HitpayClient {
         data: boolean;
         error?: undefined;
     };
-    createPayment(paymentParams: PaymentParams): Promise<hitpayResponse>;
+    createPayment(paymentParams: PaymentParams): Promise<CreatePaymentResponse | FailedHitpayResponse>;
+    deletePayment(requestId: string): Promise<SuccessHitpayResponse | FailedHitpayResponse>;
 }
 export = HitpayClient;
