@@ -12,7 +12,7 @@ yarn add hitpay
 
 ## Basic Usage
 
-The hitpay client needs to be configured with your API key and API salt, which are avaiable in the [Hitpay Dashboard](https://dashboard.hit-pay.com/).
+The hitpay client needs to be configured with your API key and API salt, which are available in the [Hitpay Dashboard](https://dashboard.hit-pay.com/).
 
 ```js
 const HitpayClient = require('hitpay');
