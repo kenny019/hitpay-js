@@ -84,6 +84,7 @@ export declare const createPaymentSuccessSchema: z.ZodObject<{
     created_at: z.ZodString;
     updated_at: z.ZodString;
 }, "strip", z.ZodTypeAny, {
+    name: string;
     email: string;
     url: string;
     status: string;
@@ -91,7 +92,6 @@ export declare const createPaymentSuccessSchema: z.ZodObject<{
     payment_methods: string[];
     currency: string;
     purpose: string;
-    name: string;
     phone: string;
     reference_number: string;
     redirect_url: string;
@@ -106,6 +106,7 @@ export declare const createPaymentSuccessSchema: z.ZodObject<{
     created_at: string;
     updated_at: string;
 }, {
+    name: string;
     email: string;
     url: string;
     status: string;
@@ -113,7 +114,6 @@ export declare const createPaymentSuccessSchema: z.ZodObject<{
     payment_methods: string[];
     currency: string;
     purpose: string;
-    name: string;
     phone: string;
     reference_number: string;
     redirect_url: string;

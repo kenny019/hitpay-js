@@ -81,4 +81,27 @@ describe('HitpayClient', () => {
 			}
 		});
 	});
+
+	describe('Get Payment Status', () => {
+		const hitpay = new HitpayClient({
+			apiKey: process.env.HITPAY_API_KEY as string,
+			apiSalt: process.env.HITPAY_SALT as string,
+			environment: 'sandbox',
+		});
+
+		test('Get payment', async () => {
+			const { success, data } = await hitpay.createPayment({
+				currency: 'SGD',
+				amount: 5,
+			});
+
+			if (success) {
+				const { success: getPaymentSuccess, data: getPaymentData } = await hitpay.getPayment(data.id);
+
+				if (getPaymentSuccess) {
+					expect(getPaymentData.id).toEqual(data.id);
+				}
+			}
+		});
+	});
 });

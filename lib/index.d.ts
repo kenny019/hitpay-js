@@ -14,5 +14,6 @@ declare class HitpayClient {
     };
     createPayment(paymentParams: PaymentParams): Promise<CreatePaymentResponse | FailedHitpayResponse>;
     deletePayment(requestId: string): Promise<SuccessHitpayResponse | FailedHitpayResponse>;
+    getPayment(requestId: string): Promise<CreatePaymentResponse | FailedHitpayResponse>;
 }
 export = HitpayClient;

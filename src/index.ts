@@ -11,26 +11,11 @@ import type {
 } from './types';
 import { createPaymentParamsSchema, hitpayConstructorSchema } from './schemas';
 import { HttpClient } from './HttpClient';
+import { BuildRequestURL, ErrorResponse, SuccessResponse } from './helpers';
 
 enum HITPAY_ENV {
-	sandbox = 'https://api.sandbox.hit-pay.com/v1/',
-	production = 'https://api.hit-pay.com/v1/',
-}
-
-function ErrorResponse(error: unknown): FailedHitpayResponse {
-	return {
-		success: false,
-		error,
-		data: undefined,
-	};
-}
-
-function SuccessResponse(data: Record<string, any> | undefined): SuccessHitpayResponse {
-	return {
-		success: true,
-		error: undefined,
-		data: data || {},
-	};
+	sandbox = 'https://api.sandbox.hit-pay.com/v1',
+	production = 'https://api.hit-pay.com/v1',
 }
 
 class HitpayClient {
@@ -92,7 +77,10 @@ class HitpayClient {
 		}
 
 		const createPaymentParam = createPaymentParamRes.data;
-		const { data, error } = await this.http.post(this.hitpayURL + 'payment-requests', createPaymentParam);
+		const { data, error } = await this.http.post(
+			BuildRequestURL(this.hitpayURL, ['payment-requests']),
+			createPaymentParam,
+		);
 
 		if (error) {
 			return ErrorResponse(error);
@@ -108,13 +96,33 @@ class HitpayClient {
 			return ErrorResponse(requestIdRes.error);
 		}
 
-		const { error } = await this.http.delete(`${this.hitpayURL}payment-requests/${requestIdRes.data}`);
+		const { error } = await this.http.delete(
+			BuildRequestURL(this.hitpayURL, ['payment-requests', requestIdRes.data]),
+		);
 
 		if (error) {
 			return ErrorResponse(error);
 		}
 
 		return SuccessResponse({});
+	}
+
+	async getPayment(requestId: string): Promise<CreatePaymentResponse | FailedHitpayResponse> {
+		const requestIdRes = z.string().safeParse(requestId);
+
+		if (!requestIdRes.success) {
+			return ErrorResponse(requestIdRes.error);
+		}
+
+		const { error, data } = await this.http.get(
+			BuildRequestURL(this.hitpayURL, ['payment-requests', requestIdRes.data]),
+		);
+
+		if (error) {
+			return ErrorResponse(error);
+		}
+
+		return SuccessResponse(data) as CreatePaymentResponse;
 	}
 }
 
