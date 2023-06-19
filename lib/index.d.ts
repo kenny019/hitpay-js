@@ -1,4 +1,4 @@
-import type { HitpayConstructorParams, PaymentParams, CreatePaymentResponse, SuccessHitpayResponse, FailedHitpayResponse } from './types';
+import type { HitpayConstructorParams, PaymentParams, CreatePaymentResponse, SuccessHitpayResponse, FailedHitpayResponse, RefundParams, RefundPaymentResponse } from './types';
 import { HttpClient } from './HttpClient';
 declare class HitpayClient {
     protected apiSalt: string;
@@ -15,5 +15,6 @@ declare class HitpayClient {
     createPayment(paymentParams: PaymentParams): Promise<CreatePaymentResponse | FailedHitpayResponse>;
     deletePayment(requestId: string): Promise<SuccessHitpayResponse | FailedHitpayResponse>;
     getPayment(requestId: string): Promise<CreatePaymentResponse | FailedHitpayResponse>;
+    refundPayment(refundParams: RefundParams): Promise<FailedHitpayResponse | RefundPaymentResponse>;
 }
 export = HitpayClient;

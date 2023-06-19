@@ -47,3 +47,22 @@ export const createPaymentSuccessSchema = z.object({
 	created_at: z.string(),
 	updated_at: z.string(),
 });
+
+export const refundPaymentSchema = z.object({
+	amount: z.number(),
+	payment_id: z.string(),
+	webhook: z.string().optional(),
+	send_email: z.boolean().optional(),
+	email: z.string().optional(),
+});
+
+export const refundPaymentSuccessSchema = z.object({
+	id: z.string(),
+	payment_id: z.string(),
+	amount_refunded: z.number(),
+	total_amount: z.number(),
+	currency: z.string(),
+	status: z.string(),
+	payment_method: z.string(),
+	created_at: z.string(),
+});

@@ -68,7 +68,7 @@ describe('HitpayClient', () => {
 			environment: 'sandbox',
 		});
 
-		test('Delete payment', async () => {
+		test('Delete payment successful', async () => {
 			const { success, data } = await hitpay.createPayment({
 				currency: 'SGD',
 				amount: 5,
@@ -102,6 +102,33 @@ describe('HitpayClient', () => {
 					expect(getPaymentData.id).toEqual(data.id);
 				}
 			}
+		});
+	});
+
+	describe('Refund Payment', () => {
+		const hitpay = new HitpayClient({
+			apiKey: process.env.HITPAY_API_KEY as string,
+			apiSalt: process.env.HITPAY_SALT as string,
+			environment: 'sandbox',
+		});
+
+		// unable to test without end to end test
+		test('Refund payment successful', async () => {
+			// const { success, data } = await hitpay.createPayment({
+			// 	currency: 'SGD',
+			// 	amount: 5,
+			// });
+			// if (success) {
+			// 	console.log(data)
+			// 	const {
+			// 		success: refundSuccess,
+			// 		data: refundData,
+			// 		error,
+			// 	} = await hitpay.refundPayment({
+			// 		amount: 5,
+			// 		payment_id: data.id,
+			// 	});
+			// }
 		});
 	});
 });

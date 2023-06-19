@@ -84,14 +84,13 @@ export declare const createPaymentSuccessSchema: z.ZodObject<{
     created_at: z.ZodString;
     updated_at: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    name: string;
-    email: string;
-    url: string;
     status: string;
     amount: string;
     payment_methods: string[];
     currency: string;
+    email: string;
     purpose: string;
+    name: string;
     phone: string;
     reference_number: string;
     redirect_url: string;
@@ -101,19 +100,19 @@ export declare const createPaymentSuccessSchema: z.ZodObject<{
     send_email: boolean;
     send_sms: boolean;
     id: string;
+    url: string;
     sms_status: string;
     email_status: string;
     created_at: string;
     updated_at: string;
 }, {
-    name: string;
-    email: string;
-    url: string;
     status: string;
     amount: string;
     payment_methods: string[];
     currency: string;
+    email: string;
     purpose: string;
+    name: string;
     phone: string;
     reference_number: string;
     redirect_url: string;
@@ -123,8 +122,56 @@ export declare const createPaymentSuccessSchema: z.ZodObject<{
     send_email: boolean;
     send_sms: boolean;
     id: string;
+    url: string;
     sms_status: string;
     email_status: string;
     created_at: string;
     updated_at: string;
+}>;
+export declare const refundPaymentSchema: z.ZodObject<{
+    amount: z.ZodNumber;
+    payment_id: z.ZodString;
+    webhook: z.ZodOptional<z.ZodString>;
+    send_email: z.ZodOptional<z.ZodBoolean>;
+    email: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    amount: number;
+    payment_id: string;
+    webhook?: string | undefined;
+    send_email?: boolean | undefined;
+    email?: string | undefined;
+}, {
+    amount: number;
+    payment_id: string;
+    webhook?: string | undefined;
+    send_email?: boolean | undefined;
+    email?: string | undefined;
+}>;
+export declare const refundPaymentSuccessSchema: z.ZodObject<{
+    id: z.ZodString;
+    payment_id: z.ZodString;
+    amount_refunded: z.ZodNumber;
+    total_amount: z.ZodNumber;
+    currency: z.ZodString;
+    status: z.ZodString;
+    payment_method: z.ZodString;
+    created_at: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    status: string;
+    currency: string;
+    id: string;
+    created_at: string;
+    payment_id: string;
+    amount_refunded: number;
+    total_amount: number;
+    payment_method: string;
+}, {
+    status: string;
+    currency: string;
+    id: string;
+    created_at: string;
+    payment_id: string;
+    amount_refunded: number;
+    total_amount: number;
+    payment_method: string;
 }>;

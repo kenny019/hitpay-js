@@ -8,8 +8,10 @@ import type {
 	CreatePaymentResponse,
 	SuccessHitpayResponse,
 	FailedHitpayResponse,
+	RefundParams,
+	RefundPaymentResponse,
 } from './types';
-import { createPaymentParamsSchema, hitpayConstructorSchema } from './schemas';
+import { createPaymentParamsSchema, hitpayConstructorSchema, refundPaymentSchema } from './schemas';
 import { HttpClient } from './HttpClient';
 import { BuildRequestURL, ErrorResponse, SuccessResponse } from './helpers';
 
@@ -123,6 +125,24 @@ class HitpayClient {
 		}
 
 		return SuccessResponse(data) as CreatePaymentResponse;
+	}
+
+	async refundPayment(refundParams: RefundParams) {
+		const refundPaymentParamRes = refundPaymentSchema.safeParse(refundParams);
+
+		if (!refundPaymentParamRes.success) {
+			return ErrorResponse(refundPaymentParamRes.error);
+		}
+
+		const refundPaymentParam = refundPaymentParamRes.data;
+
+		const { data, error } = await this.http.post(BuildRequestURL(this.hitpayURL, ['refund']), refundPaymentParam);
+
+		if (error) {
+			return ErrorResponse(error);
+		}
+
+		return SuccessResponse(data) as RefundPaymentResponse;
 	}
 }
 
