@@ -131,4 +131,35 @@ describe('HitpayClient', () => {
 			// }
 		});
 	});
+
+	describe('Subscriptions', () => {
+		const hitpay = new HitpayClient({
+			apiKey: process.env.HITPAY_API_KEY as string,
+			apiSalt: process.env.HITPAY_SALT as string,
+			environment: 'sandbox',
+		});
+
+		test('Create subscription successful', async () => {
+			const { success } = await hitpay.createSubscription({
+				name: 'new_plan',
+				cycle: 'weekly',
+				amount: 5,
+			});
+
+			expect(success).toBeTruthy();
+		});
+
+		test('Create subscription with custom cycle', async () => {
+			const { success, error } = await hitpay.createSubscription({
+				name: 'new_plan_1',
+				cycle: 'custom',
+				cycle_frequency: 'month', // required when cycle is custom
+				cycle_repeat: 6, // required when cycle is custom
+				amount: 5,
+			});
+
+			console.log(error);
+			expect(success).toBeTruthy();
+		});
+	});
 });

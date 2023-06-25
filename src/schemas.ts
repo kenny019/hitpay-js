@@ -66,3 +66,42 @@ export const refundPaymentSuccessSchema = z.object({
 	payment_method: z.string(),
 	created_at: z.string(),
 });
+
+const subscriptionSchemaBase = z.object({
+	name: z.string(),
+	description: z.string().optional(),
+	currency: z.string().optional(),
+	amount: z.number(),
+	reference: z.string().optional(),
+});
+
+export const subscriptionSchema = z.union([
+	z
+		.object({
+			cycle: z.union([z.literal('weekly'), z.literal('monthly'), z.literal('yearly'), z.literal('save_card')]),
+			cycle_repeat: z.number().optional(),
+			cycle_frequency: z.string().optional(),
+		})
+		.merge(subscriptionSchemaBase),
+	z
+		.object({
+			cycle: z.literal('custom'),
+			cycle_repeat: z.number(),
+			cycle_frequency: z.string(),
+		})
+		.merge(subscriptionSchemaBase),
+]);
+
+export const createSubscriptionSuccessSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	description: z.string(),
+	cycle: z.string(),
+	cycle_repeat: z.string(),
+	cycle_frequency: z.string(),
+	currency: z.string(),
+	amount: z.number(),
+	reference: z.string(),
+	created_at: z.string(),
+	updated_at: z.string(),
+});

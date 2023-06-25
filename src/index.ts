@@ -10,8 +10,11 @@ import type {
 	FailedHitpayResponse,
 	RefundParams,
 	RefundPaymentResponse,
+	SubscriptionParams,
+	CreateSubscriptionSuccessResponse,
+	CreateSubscriptionResponse,
 } from './types';
-import { createPaymentParamsSchema, hitpayConstructorSchema, refundPaymentSchema } from './schemas';
+import { createPaymentParamsSchema, hitpayConstructorSchema, refundPaymentSchema, subscriptionSchema } from './schemas';
 import { HttpClient } from './HttpClient';
 import { BuildRequestURL, ErrorResponse, SuccessResponse } from './helpers';
 
@@ -143,6 +146,27 @@ class HitpayClient {
 		}
 
 		return SuccessResponse(data) as RefundPaymentResponse;
+	}
+
+	async createSubscription(subscriptionParams: SubscriptionParams) {
+		const subscriptionParamRes = subscriptionSchema.safeParse(subscriptionParams);
+
+		if (!subscriptionParamRes.success) {
+			return ErrorResponse(subscriptionParamRes.error);
+		}
+
+		const subscriptionParam = subscriptionParamRes.data;
+
+		const { data, error } = await this.http.post(
+			BuildRequestURL(this.hitpayURL, ['subscription-plan']),
+			subscriptionParam,
+		);
+
+		if (error) {
+			return ErrorResponse(error);
+		}
+
+		return SuccessResponse(data) as CreateSubscriptionResponse;
 	}
 }
 
