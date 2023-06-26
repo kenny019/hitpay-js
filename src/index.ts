@@ -2,7 +2,6 @@ import z from 'zod';
 
 import { createHmac } from 'crypto';
 import type {
-	CreatePaymentSuccessResponse,
 	HitpayConstructorParams,
 	PaymentParams,
 	CreatePaymentResponse,
@@ -11,8 +10,9 @@ import type {
 	RefundParams,
 	RefundPaymentResponse,
 	SubscriptionParams,
-	CreateSubscriptionSuccessResponse,
 	CreateSubscriptionResponse,
+	GetAllSubscriptionResponse,
+	GetSubscriptionResponse,
 } from './types';
 import { createPaymentParamsSchema, hitpayConstructorSchema, refundPaymentSchema, subscriptionSchema } from './schemas';
 import { HttpClient } from './HttpClient';
@@ -77,9 +77,7 @@ class HitpayClient {
 	async createPayment(paymentParams: PaymentParams): Promise<CreatePaymentResponse | FailedHitpayResponse> {
 		const createPaymentParamRes = createPaymentParamsSchema.safeParse(paymentParams);
 
-		if (!createPaymentParamRes.success) {
-			return ErrorResponse(createPaymentParamRes.error);
-		}
+		if (!createPaymentParamRes.success) return ErrorResponse(createPaymentParamRes.error);
 
 		const createPaymentParam = createPaymentParamRes.data;
 		const { data, error } = await this.http.post(
@@ -87,9 +85,7 @@ class HitpayClient {
 			createPaymentParam,
 		);
 
-		if (error) {
-			return ErrorResponse(error);
-		}
+		if (error) return ErrorResponse(error);
 
 		return SuccessResponse(data) as CreatePaymentResponse;
 	}
@@ -97,17 +93,13 @@ class HitpayClient {
 	async deletePayment(requestId: string): Promise<SuccessHitpayResponse | FailedHitpayResponse> {
 		const requestIdRes = z.string().safeParse(requestId);
 
-		if (!requestIdRes.success) {
-			return ErrorResponse(requestIdRes.error);
-		}
+		if (!requestIdRes.success) return ErrorResponse(requestIdRes.error);
 
 		const { error } = await this.http.delete(
 			BuildRequestURL(this.hitpayURL, ['payment-requests', requestIdRes.data]),
 		);
 
-		if (error) {
-			return ErrorResponse(error);
-		}
+		if (error) return ErrorResponse(error);
 
 		return SuccessResponse({});
 	}
@@ -115,17 +107,13 @@ class HitpayClient {
 	async getPayment(requestId: string): Promise<CreatePaymentResponse | FailedHitpayResponse> {
 		const requestIdRes = z.string().safeParse(requestId);
 
-		if (!requestIdRes.success) {
-			return ErrorResponse(requestIdRes.error);
-		}
+		if (!requestIdRes.success) return ErrorResponse(requestIdRes.error);
 
 		const { error, data } = await this.http.get(
 			BuildRequestURL(this.hitpayURL, ['payment-requests', requestIdRes.data]),
 		);
 
-		if (error) {
-			return ErrorResponse(error);
-		}
+		if (error) return ErrorResponse(error);
 
 		return SuccessResponse(data) as CreatePaymentResponse;
 	}
@@ -133,17 +121,13 @@ class HitpayClient {
 	async refundPayment(refundParams: RefundParams) {
 		const refundPaymentParamRes = refundPaymentSchema.safeParse(refundParams);
 
-		if (!refundPaymentParamRes.success) {
-			return ErrorResponse(refundPaymentParamRes.error);
-		}
+		if (!refundPaymentParamRes.success) return ErrorResponse(refundPaymentParamRes.error);
 
 		const refundPaymentParam = refundPaymentParamRes.data;
 
 		const { data, error } = await this.http.post(BuildRequestURL(this.hitpayURL, ['refund']), refundPaymentParam);
 
-		if (error) {
-			return ErrorResponse(error);
-		}
+		if (error) return ErrorResponse(error);
 
 		return SuccessResponse(data) as RefundPaymentResponse;
 	}
@@ -151,9 +135,7 @@ class HitpayClient {
 	async createSubscription(subscriptionParams: SubscriptionParams) {
 		const subscriptionParamRes = subscriptionSchema.safeParse(subscriptionParams);
 
-		if (!subscriptionParamRes.success) {
-			return ErrorResponse(subscriptionParamRes.error);
-		}
+		if (!subscriptionParamRes.success) return ErrorResponse(subscriptionParamRes.error);
 
 		const subscriptionParam = subscriptionParamRes.data;
 
@@ -162,11 +144,31 @@ class HitpayClient {
 			subscriptionParam,
 		);
 
-		if (error) {
-			return ErrorResponse(error);
-		}
+		if (error) return ErrorResponse(error);
 
 		return SuccessResponse(data) as CreateSubscriptionResponse;
+	}
+
+	async getAllSubscription() {
+		const { data, error } = await this.http.get(BuildRequestURL(this.hitpayURL, ['subscription-plan']));
+
+		if (error) return ErrorResponse(error);
+
+		return SuccessResponse(data) as GetAllSubscriptionResponse;
+	}
+
+	async getSubscription(planId: string) {
+		const planIdRes = z.string().safeParse(planId);
+
+		if (!planIdRes.success) return ErrorResponse(planIdRes.error);
+
+		const { error, data } = await this.http.get(
+			BuildRequestURL(this.hitpayURL, ['subscription-plan', planIdRes.data]),
+		);
+
+		if (error) return ErrorResponse(error);
+
+		return SuccessResponse(data) as GetSubscriptionResponse;
 	}
 }
 

@@ -16,13 +16,13 @@ export type InvalidResponse = {
 export type HitpayConstructorParams = z.infer<typeof hitpayConstructorSchema>;
 
 export type PaymentParams = z.infer<typeof createPaymentParamsSchema>;
-export type CreatePaymentSuccessResponse = z.infer<typeof createPaymentSuccessSchema>;
+export type CreatePaymentSuccessData = z.infer<typeof createPaymentSuccessSchema>;
 
 export type RefundParams = z.infer<typeof refundPaymentSchema>;
-export type RefundPaymentSuccessResponse = z.infer<typeof refundPaymentSuccessSchema>;
+export type RefundPaymentSuccessData = z.infer<typeof refundPaymentSuccessSchema>;
 
 export type SubscriptionParams = z.infer<typeof subscriptionSchema>;
-export type CreateSubscriptionSuccessResponse = z.infer<typeof createSubscriptionSuccessSchema>;
+export type CreateSubscriptionSuccessData = z.infer<typeof createSubscriptionSuccessSchema>;
 
 export type HttpResponse = {
 	data: Record<string, any> | undefined;
@@ -41,13 +41,49 @@ export type SuccessHitpayResponse = {
 	success: true;
 };
 
+type BaseSubscriptionRecord = CreateSubscriptionSuccessData & {
+	price: number;
+};
+
+type GetAllSubscriptionData = {
+	data: BaseSubscriptionRecord[];
+	links: {
+		first: string;
+		last: string;
+		prev: string;
+		next: string;
+	};
+	meta: {
+		current_page: number;
+		from: number;
+		last_page: number;
+		links: {
+			url: string;
+			label: string;
+			active: boolean;
+		}[];
+		path: string;
+		per_page: number;
+		to: number;
+		total: number;
+	};
+};
+
 export interface RefundPaymentResponse extends SuccessHitpayResponse {
-	data: RefundPaymentSuccessResponse;
+	data: RefundPaymentSuccessData;
 }
 export interface CreatePaymentResponse extends SuccessHitpayResponse {
-	data: CreatePaymentSuccessResponse;
+	data: CreatePaymentSuccessData;
 }
 
 export interface CreateSubscriptionResponse extends SuccessHitpayResponse {
-	data: CreateSubscriptionSuccessResponse;
+	data: CreateSubscriptionSuccessData;
+}
+
+export interface GetAllSubscriptionResponse extends SuccessHitpayResponse {
+	data: GetAllSubscriptionData;
+}
+
+export interface GetSubscriptionResponse extends SuccessHitpayResponse {
+	data: GetAllSubscriptionData;
 }

@@ -97,7 +97,7 @@ export const createSubscriptionSuccessSchema = z.object({
 	name: z.string(),
 	description: z.string(),
 	cycle: z.string(),
-	cycle_repeat: z.string(),
+	cycle_repeat: z.number(),
 	cycle_frequency: z.string(),
 	currency: z.string(),
 	amount: z.number(),

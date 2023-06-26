@@ -150,7 +150,7 @@ describe('HitpayClient', () => {
 		});
 
 		test('Create subscription with custom cycle', async () => {
-			const { success, error } = await hitpay.createSubscription({
+			const { success } = await hitpay.createSubscription({
 				name: 'new_plan_1',
 				cycle: 'custom',
 				cycle_frequency: 'month', // required when cycle is custom
@@ -158,8 +158,27 @@ describe('HitpayClient', () => {
 				amount: 5,
 			});
 
-			console.log(error);
 			expect(success).toBeTruthy();
+		});
+
+		test('Get all subscriptions', async () => {
+			const { success } = await hitpay.getAllSubscription();
+
+			expect(success).toBeTruthy();
+		});
+
+		test('Get specific subscription', async () => {
+			const { success: createSubSuccess, data: createSubData } = await hitpay.createSubscription({
+				name: 'new_plan',
+				cycle: 'weekly',
+				amount: 5,
+			});
+
+			if (createSubSuccess) {
+				const { success } = await hitpay.getSubscription(createSubData.id);
+
+				expect(success).toBeTruthy();
+			}
 		});
 	});
 });
